@@ -47,6 +47,11 @@ abstract class Enum implements EnumContract, Castable, Arrayable, \JsonSerializa
     protected static array $reflectionCache = [];
 
     /**
+     * @var array<string>
+     */
+    protected static array $hidden = [];
+
+    /**
      * Construct an Enum instance.
      *
      * @param  TValue  $enumValue
@@ -412,6 +417,11 @@ abstract class Enum implements EnumContract, Castable, Arrayable, \JsonSerializa
         return new static(static::getRandomValue());
     }
 
+    public static function getHidden(): array
+    {
+        return static::$hidden;
+    }
+
     /**
      * Return the enum as an array.
      *
@@ -419,7 +429,14 @@ abstract class Enum implements EnumContract, Castable, Arrayable, \JsonSerializa
      */
     public static function asArray(): array
     {
-        return static::getConstants();
+        $hidden = static::getHidden();
+        $constants = static::getConstants();
+
+        if (count($hidden) === 0) {
+            return $constants;
+        }
+
+        return array_diff($constants, $hidden);
     }
 
     /**
